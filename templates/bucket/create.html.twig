@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+{% block title %}Création{% endblock %}
+{% block content %}
+    <video autoplay muted loop style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: translate(-50%, -50%);
+        z-index: -1; /* Place the video behind other content */">
+        <source src="{{ asset('videos/background_video.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <a href="{{ path('app_bucket_list') }}" class="back">&#8592; Retour à la liste des buckets</a>
+
+    <h1>Créer un nouveau rêve</h1>
+    {{ form_start(bucketForm) }}
+    <div class="form-control">
+        {{ form_row(bucketForm.name) }}
+    </div>
+    <div class="form-control">
+        {{ form_row(bucketForm.description) }}
+    </div>
+
+    <div class="form-control">
+        {{ form_row(bucketForm.category) }}
+    </div>
+    <button type="submit">Créer</button>
+    {{ form_end(bucketForm) }}
+
+{% endblock %}

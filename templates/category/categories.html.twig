@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catégories{% endblock %}
+{% block content %}
+    <h2>Toutes les catégories</h2>
+    <div class="list-items">
+        <ul class="grid-items">
+            {% for category in categories %}
+                <li>
+                    <a href="{{ path('app_bucket_recherche_categorie_by_id', {'id': category.id}) }}">
+                        <button class="detailsBtn" type="submit" title="Voir la catégorie"
+                                value="{{ category.id }}">{{ category.name }}
+                        </button>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+
+
+

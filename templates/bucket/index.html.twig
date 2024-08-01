@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+{% block title %}Bucket list{% endblock %}
+{% block extrastyles %}
+    <style>
+        {% for item in items %}
+        .bg-category-{{ item.category.id }}::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("{{ asset('img/backdrops/' ~ item.category.name ~ '-min.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            border-radius: 24px;
+            filter: grayscale(40%);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        {% endfor %}
+    </style>
+{% endblock %}
+{% block content %}
+
+    <h2>Voici la liste des choses que tu veux faire avant de mourir</h2>
+
+
+    <!-- bouton filtre by status -->
+    <div class="form-column-mapper">
+        <form action="{{ path('app_bucket_recherche') }}" method="post">
+            <div class="row-mapper">
+                <div class="row-mapper">
+                    <label for="rechercher">Recherche</label>
+                    <input type="text" name="rechercher" id="rechercher">
+                    <label for="toggle">Titre</label>
+                    <input type="radio" id="titreRadio" name="toggle" value="titre" checked>
+                    <label for="toggle">Auteur</label>
+                    <input type="radio" id="auteurRadio" name="toggle" value="auteur">
+
+                    <button type="submit">Rechercher</button>
+                </div>
+            </div>
+        </form>
+        <form action="{{ path('app_bucket_recherche_categorie') }}" method="post">
+            <div class="row-mapper">
+                <label for="category">Catégorie</label>
+                <select name="category" id="category">
+                    <option value="0">Toutes</option>
+                    {% for category in categories %}
+
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Recherche par catégorie</button>
+            </div>
+        </form>
+        <form action="{{ path('app_bucket_filter') }}" method="get">
+            <div class="row-mapper">
+                <label for="status">Filtrer par statut</label>
+                <select name="status" id="status">
+                    <option value="all">Tous</option>
+                    <option value="done">Réalisés</option>
+                    <option value="undone">Non réalisés</option>
+                </select>
+                <label for="date">Trier par date</label>
+                <select name="date" id="date">
+                    <option value="asc">Croissant</option>
+                    <option value="desc">Décroissant</option>
+                </select>
+                <button type="submit">Appliquer</button>
+            </div>
+        </form>
+    </div>
+    {% if items is empty %}
+        <h3>Aucun bucket trouvé</h3>
+    {% endif %}
+    <!-- On affiche les items selon le filtre status et date -->
+    {% if app.request.query.get('status') == 'done' and app.request.query.get('date') == 'asc' %}
+        <h3>Voeux exaucés</h3>
+        {% set items = items|filter(item => item.status == 'done') %}
+        {% set items = items|sort((a, b) => a.createdAt > b.createdAt) %}
+    {% elseif app.request.query.get('status') == 'undone' and app.request.query.get('date') == 'asc' %}
+        <h3>Voeux pas encore réalisés</h3>
+        {% set items = items|filter(item => item.status == 'undone') %}
+        {% set items = items|sort((a, b) => a.createdAt > b.createdAt) %}
+    {% elseif app.request.query.get('status') == 'done' and app.request.query.get('date') == 'desc' %}
+        <h3>Voeux exaucés</h3>
+        {% set items = items|filter(item => item.status == 'done') %}
+        {% set items = items|sort((a, b) => a.createdAt < b.createdAt) %}
+    {% elseif app.request.query.get('status') == 'undone' and app.request.query.get('date') == 'desc' %}
+        <h3>Voeux pas encore réalisés</h3>
+        {% set items = items|filter(item => item.status == 'undone') %}
+        {% set items = items|sort((a, b) => a.createdAt < b.createdAt) %}
+    {% elseif app.request.query.get('status') == 'done' %}
+        <h3>Voeux exaucés</h3>
+        {% set items = items|filter(item => item.status == 'done') %}
+    {% elseif app.request.query.get('status') == 'undone' %}
+        <h3>Voeux pas encore réalisés</h3>
+        {% set items = items|filter(item => item.status == 'undone') %}
+    {% endif %}
+
+    {% if app.request.query.get('date') == 'asc' %}
+        {% set items = items|sort((a, b) => a.createdAt > b.createdAt) %}
+    {% elseif app.request.query.get('date') == 'desc' %}
+        {% set items = items|sort((a, b) => a.createdAt < b.createdAt) %}
+    {% endif %}
+
+
+    <div class="list-items">
+        <ul>
+            {% for item in items %}
+                {% set categoryClass = 'bg-category-' ~ item.category.id %}
+                <a class="item {{ categoryClass }}" href="{{ path('app_bucket_item', {'id': item.id}) }}"
+                   title="View this bucket in details" data-aos="fade-up">
+                    <div class="column-mapper">
+                        <p class="detailsBtn">{{ item.category.getName() }}</p>
+                        <li><h4>{{ item.name|upper }}</h4></li>
+                        <i style="font-size: small">Par {{ item.user.firstname }} {{ item.user.lastname }}</i>
+                        <i style="font-size: small">Publiée le : {{ item.createdAt|date('d-m-Y') }}</i>
+                    </div>
+
+                    <p>{{ item.description }}</p>
+                    <button type="submit" class="detailsBtn">Voir plus</button>
+
+                    {% if item.status == 'done' %}
+                        <p>&#x2705; REVE EXAUCE</p>
+                    {% else %}
+                        <p>&#x274C; NON REALISE</p>
+                    {% endif %}
+
+                </a>
+            {% endfor %}
+        </ul>
+    </div>
+
+
+    <div style="padding:100px 120px;border: 1px solid black; border-radius: 48px;margin: 50px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px;"
+         data-aos="fade-up">
+        <h3 style="text-align: center" data-aos="fade-down">Encore plus d'aventure ?</h3>
+        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 20px;">
+            <a href="{{ path('app_bucket_create') }}" data-aos="fade-right">
+                <button id="createBtn">Créer</button>
+            </a>
+            <a href="{{ path('app_bucket_find') }}" data-aos="fade-left">
+                <button id="findBtn">Parcourir notre liste</button>
+            </a>
+        </div>
+    </div>
+{% endblock content %}
+

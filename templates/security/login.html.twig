@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block content %}
+    <video autoplay muted loop>
+        <source src="{{ asset('videos/background_video.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <form method="post" id="login">
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="mb-3">
+                Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Déconnexion</a>
+            </div>
+        {% endif %}
+
+        <h1 class="h3 mb-3 font-weight-normal">Veuillez vous connecter</h1>
+        <label for="inputEmail">Email</label>
+        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control"
+               autocomplete="email" required autofocus>
+        <label for="inputPassword">Mot de passe</label>
+        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password"
+               required>
+
+        <input type="hidden" name="_csrf_token"
+               value="{{ csrf_token('authenticate') }}"
+        >
+
+        <label for="remember_me">
+            <input type="checkbox" id="remember_me" name="_remember_me">
+            Se souvenir de moi
+        </label>
+
+        <button class="btn btn-lg btn-primary" type="submit">
+            Se connecter
+        </button>
+        <a href="{{ path('app_register') }}" title="Sign up">Créer un compte</a>
+        <div>
+            <a  href="{{ path('app_forgot_password_request') }}" title="Forgot password">Mot de passe oublié ?</a>
+        </div>
+    </form>
+
+{% endblock %}

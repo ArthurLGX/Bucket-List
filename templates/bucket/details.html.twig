@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+{% set name = item.name %}
+{% block title %}{{ name }}{% endblock %}
+{% block extrastyles %}
+    <style>
+        .bg-category-{{ item.category.id }}::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("{{ asset('img/backdrops/' ~ item.category.name ~ '-min.jpg') }}");
+            background-size: cover;
+            z-index: -1;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <!-- Form for Updating Item -->
+    <a href="{{ path('app_bucket_list') }}" class="back">&#8592; Retour à la liste des buckets</a>
+    {% set categoryClass = 'bg-category-' ~ item.category.id %}
+    <form id="create" class="{{ categoryClass  }}" method="post" action="{{ path('app_bucket_item', {'id': item.id}) }}">
+        <div class="column-mapper">
+            <p class="detailsBtn">{{ item.category.getName() }}</p>
+            <h1>{{ item.name }}</h1>
+            <p>Crée par {{ item.author.getFirstname }} {{ item.author.getLastname }} le {{ item.createdAt|date('d/m/Y') }}</p>
+            <h3 id="description">{{ item.description }}</h3>
+        </div>
+        <div class="btn-row-mapper">
+            <!-- On affiche uniquement si
+            {% %}
+            <label for="status">Status</label>
+            <select name="status" id="status">
+                <option value="done" {% if item.status == 'done' %}selected{% endif %}>Fait</option>
+                <option value="undone" {% if item.status == 'undone' %}selected{% endif %}>A faire</option>
+            </select>
+            <button type="submit">Valider</button>
+
+            {%  if is_granted('ROLE_ADMIN') %}
+            <a href={{ path('app_bucket_update', {'id': item.id})}}><img src="{{ asset('img/update.png') }}" class="form-img" alt="Update Bucket"><p id="text-hidden">Mise à jour</p></a>
+            {% endif %}
+        </div>
+        <!-- Si le bucket est dans liste du user connecté, on affiche le bouton pour le retirer -->
+        {#{% if item in app.user.getBucket %}
+        <form method="post" action="{{ path('app_bucket_delete', {'id': item.id}) }}"
+              onsubmit="return confirm('Are you sure you want to delete this item?');">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit" id="deleteBtn">Retirer de la liste</button>
+        </form>
+        {% endif %}#}
+    </form>
+
+    <!-- Form for Deleting item only if the user is admin -->
+    {% if is_granted('ROLE_ADMIN') %}
+    <form method="post" action="{{ path('app_bucket_delete', {'id': item.id}) }}"
+          onsubmit="return confirm('Are you sure you want to delete this item?');">
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="submit" id="deleteBtn">Retirer de la liste</button>
+    </form>
+    {% endif %}
+
+{% endblock %}

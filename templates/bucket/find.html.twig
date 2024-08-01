@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+{% set name = 'Trouve toi une nouvelle aventure dans notre bucket liste' %}
+{% block title %}Create{% endblock %}
+{% block extrastyles %}
+    <style>
+        {% for item in items %}
+        .bg-category-{{ item.category.id }}::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("{{ asset('img/backdrops/' ~ item.category.name ~ '-min.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            border-radius: 24px;
+            filter: grayscale(40%);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        {% endfor %}
+    </style>
+{% endblock %}
+{% block content %}
+    <h1>{{ name }}</h1>
+    <div class="form-column-mapper">
+        <form action="{{ path('app_bucket_find') }}" method="post">
+            <div class="row-mapper">
+                <div class="row-mapper">
+                    <label for="rechercher">Recherche</label>
+                    <input type="text" name="rechercher" id="rechercher">
+                    <label for="toggle">Titre</label>
+                    <input type="radio" id="titreRadio" name="toggle" value="titre" checked>
+                    <label for="toggle">Auteur</label>
+                    <input type="radio" id="auteurRadio" name="toggle" value="auteur">
+                    <button type="submit">Rechercher</button>
+                </div>
+            </div>
+        </form>
+
+        <form action="{{ path('app_bucket_filter') }}" method="get">
+            <div class="row-mapper">
+                <label for="date">Trier par date</label>
+                <select name="date" id="date">
+                    <option value="asc">Croissant</option>
+                    <option value="desc">Décroissant</option>
+                </select>
+                <button type="submit">Appliquer</button>
+            </div>
+        </form>
+        <a href="{{ path('app_category_entity') }}" title="Sign out">
+            <button id="findBtn">Catégories</button>
+        </a>
+    </div>
+    {% if items is empty %}
+        <h3>Aucun bucket trouvé</h3>
+    {% endif %}
+
+    <!-- On affiche les items selon la date -->
+
+    {% if app.request.query.get('date') == 'asc' %}
+        {% set items = items|sort((a, b) => a.createdAt > b.createdAt) %}
+    {% elseif app.request.query.get('date') == 'desc' %}
+        {% set items = items|sort((a, b) => a.createdAt < b.createdAt) %}
+    {% endif %}
+
+    <div class="list-items">
+        <ul>
+            {% for item in items %} {% set categoryClass = 'bg-category-' ~ item.category.id %}
+                <a class="item {{ categoryClass }}" href="{{ path('app_bucket_item', {'id': item.id}) }}"
+                   title="View this bucket in details" data-aos="fade-up">
+                    <div class="column-mapper">
+                        <p class="detailsBtn">{{ item.category.getName() }}</p>
+
+                        <li><h4>{{ item.name|upper }}</h4></li>
+                        <i>Créé par {{ item.author.getFirstname }} {{ item.author.getLastName }}</i> <i
+                                style="font-size: small">Publiée le
+                            : {{ item.createdAt|date('d-m-Y') }}</i>
+                    </div>
+                    <p>{{ item.description }}</p>
+                </a>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

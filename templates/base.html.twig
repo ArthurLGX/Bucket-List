@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0">
+    <meta http-equiv=" X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href={{ asset('style/style.css') }}>
+    <link rel="icon" type="image/png" href={{ asset('img/logo_bucket.png') }}>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <title>{% block title %}Bucket List{% endblock %}</title>
+    {% block extrastyles %}{% endblock %}
+</head>
+<body>
+{% block javascripts %}
+    <script>
+        AOS.init({
+            duration: 500, // duration of the animation in milliseconds
+            once: false,     // whether animation should happen only once
+        });
+    </script>
+{% endblock %}
+<header>
+    {% if app.user %}
+        <h1><a href="{{ path('app_bucket_list') }}" title="Home"><img src="{{ asset('img/logo_bucket.png') }}" alt="Logo">Bucket
+                List</a></h1>
+        <h3 style="margin:0;">Bonjour {{ app.user.firstname }} {% if is_granted('ROLE_ADMIN') %}👑{% else %}👤{%  endif  %}</h3>
+    {% else %}
+        <h1><a href="{{ path('login') }}" title="Home"><img src="{{ asset('img/logo_bucket.png') }}" alt="Logo">Bucket
+                List</a></h1>
+    {% endif %}
+
+    <nav>
+        <ul class="list-items">
+
+            {% if app.user %}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li><a href="{{ path('app_admin_dashboard') }}" title="Home">Dashboard</a></li>
+                {% endif %}
+                <li><a href="{{ path('app_category_entity') }}" title="Sign out">Catégories</a></li>
+                <li><a href="{{ path('app_logout') }}" title="Sign out">Déconnexion &#x1F50C;</a></li>
+            {% else %}
+                <div style="display:flex; flex-direction: row; align-items: center; margin-left: 40px;gap: 10px;">
+                    <li><a href="{{ path('app_login') }}" title="Sign in">Connexion</a></li>
+                    {# <li>
+                        <button><a href="{{ path('app_signup') }}" title="Sign up">Inscription</a></button>
+                    </li> #}
+                </div>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+
+<main>
+    {% for label, messages in app.flashes(['success', 'warning']) %}
+        {% for message in messages %}
+            <div class="flash flash-{{ label }}">
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% block content %}{% endblock %}
+</main>
+<footer>
+    <p>Bucket List 2024 &copy;</p>
+</footer>
+
+</body>
+</html>

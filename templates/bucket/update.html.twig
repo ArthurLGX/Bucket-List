@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+{% block extrastyles %}
+    <style>
+        .bg-category-{{ item.category.id }}::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("{{ asset('img/backdrops/' ~ item.category.name ~ '-min.jpg') }}");
+            background-size: cover;
+            background-position: top;
+            border-radius: 24px;
+            filter: grayscale(0%);
+            z-index: -1;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <a href="{{ path('app_bucket') }}" class="back">&#8592; Retour à la liste des rêves</a>
+    {% set categoryClass = 'bg-category-' ~ item.category.id %}
+    {{ form_start(bucketForm, {'attr': {'class': 'bg-category ' ~ categoryClass}}) }}
+    <h1>Mettre à jour le rêve</h1>
+    <div class="form-control">
+        {{ form_row(bucketForm.name) }}
+    </div>
+    <div class="form-control">
+        {{ form_row(bucketForm.description) }}
+    </div>
+    <div class="form-control">
+        {{ form_row(bucketForm.author) }}
+    </div>
+    <div class="form-control">
+        {{ form_row(bucketForm.status) }}
+    </div>
+    <button type="submit">Mettre à jour</button>
+    {{ form_end(bucketForm) }}
+{% endblock %}

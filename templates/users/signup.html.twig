@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Signup{% endblock %}
+
+{% block content %}
+    <h1>Signup</h1>
+    <div class="column-mapper">
+        {{ form_start(signUpForm) }}
+        <div class="form-control">
+            {{ form_row(signUpForm.username) }}
+        </div>
+        <div class="form-control">
+            {{ form_row(signUpForm.email) }}
+        </div>
+        <div class="form-control">
+            {{ form_row(signUpForm.plainPassword) }}
+        </div>
+    </div>
+    <button type="submit">Signup</button>
+    {{ form_end(signUpForm) }}
+{% endblock %}

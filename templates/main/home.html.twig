@@ -1,13 +1,46 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Bucket List</title>
-</head>
-<body>
-<h1> Bucket List</h1>
-</body>
-</html>
+{% extends 'base.html.twig' %}
+{% block title %}Bucket list{% endblock %}
+
+{% block content %}
+    <div class="home" >
+        <video autoplay muted loop>
+            <source src="{{ asset('videos/background_video.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <h1>Aujourd'hui, <span id="phrase">{{ phrases[0] }}</span></h1>
+        <a href="{{ path('app_bucket_list') }}" title="Bucket List">
+            <button>Commencer l'aventure</button>
+        </a>
+    </div>
+    <script>
+        const phrases = {{ phrases|json_encode|raw }};
+        let currentIndex = 0;
+        const phraseElement = document.getElementById('phrase');
+
+        setInterval(() => {
+            phraseElement.style.transition = 'none';
+            phraseElement.style.transform = 'translateY(0)';
+            phraseElement.style.opacity = '1';
+
+            setTimeout(() => {
+                phraseElement.style.transition = 'transform 0.5s, opacity 0.5s';
+                phraseElement.style.transform = 'translateY(-10px)';
+                phraseElement.style.opacity = '0';
+            }, 0);
+
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % phrases.length;
+                phraseElement.textContent = phrases[currentIndex];
+                phraseElement.style.transition = 'none';
+                phraseElement.style.transform = 'translateY(10px)';
+                phraseElement.style.opacity = '0';
+
+                setTimeout(() => {
+                    phraseElement.style.transition = 'transform 0.5s, opacity 0.5s';
+                    phraseElement.style.transform = 'translateY(0)';
+                    phraseElement.style.opacity = '1';
+                }, 0);
+            }, 500);
+        }, 2000);
+    </script>
+{% endblock content %}
